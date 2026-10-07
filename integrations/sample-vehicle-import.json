@@ -1,0 +1,24 @@
+{
+  "partnerId": "OSP",
+  "messageRef": "OSP-MSG-88412",
+  "shipmentId": "OSP-2026-03317",
+  "expectedArrival": "2026-10-08T09:30:00+02:00",
+  "terminalCode": "BEZEE",
+  "vehicles": [
+    {
+      "vin": "YV1XZK9V1R2000731",
+      "make": "Volvo",
+      "model": "EX30"
+    },
+    {
+      "vin": "KNAB2512AST123456",
+      "make": "Kia",
+      "model": "EV3"
+    },
+    {
+      "vin": "YV1XZK9V1R2000748",
+      "make": "Volvo",
+      "model": "EX30"
+    }
+  ]
+}

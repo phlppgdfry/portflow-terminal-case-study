@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  service:
+    name: Service tests, smoke test, incident replay
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Unit, service and API tests
+        working-directory: service
+        run: python -m unittest discover -s tests -v
+      - name: Smoke test (release plan S1-S6)
+        run: scripts/smoke-test.sh
+      - name: Replay INC-001 and its fix
+        run: scripts/simulate-incident.sh
+      - name: Documentation links
+        run: python scripts/check-links.py
+
+  oracle:
+    name: Oracle schema and diagnostic queries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run database/*.sql on Oracle Database Free
+        run: scripts/oracle-validate.sh

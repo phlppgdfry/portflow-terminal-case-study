@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PortFlow Operations</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #fff; --text: #17202a; --muted: #5b6673; --line: #dde2e8;
+    --ok: #1e7f4f; --warn: #a15c00; --bad: #b42318; --accent: #1f5fae;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #11161c; --panel: #19212a; --text: #e6ebf0; --muted: #98a4b1; --line: #2a3541;
+            --ok: #4cc38a; --warn: #f0a83a; --bad: #f2786c; --accent: #6ea8ff; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+           padding: 14px 20px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  h1 { font-size: 17px; margin: 0; }
+  h2 { font-size: 14px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  main { display: grid; gap: 16px; padding: 16px 20px; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; min-width: 0; }
+  .wide { grid-column: 1 / -1; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid currentColor; }
+  .UP, .ACCEPTED { color: var(--ok); } .DEGRADED, .DUPLICATE, .PENDING { color: var(--warn); }
+  .DOWN, .REJECTED { color: var(--bad); }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+  .tile { border: 1px solid var(--line); border-radius: 6px; padding: 10px; }
+  .tile b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .tile span { color: var(--muted); font-size: 12px; }
+  .scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; }
+  tr.click { cursor: pointer; } tr.click:hover { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+  select, button { font: inherit; padding: 4px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); }
+  pre { white-space: pre-wrap; word-break: break-all; background: var(--bg); padding: 10px; border-radius: 6px; max-height: 260px; overflow: auto; }
+  .muted { color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>PortFlow · Terminal Operations</h1>
+  <div id="health" class="muted">checking…</div>
+</header>
+<main>
+  <section class="wide">
+    <h2>Last 24 hours</h2>
+    <div class="tiles" id="tiles"></div>
+  </section>
+  <section class="wide">
+    <h2>Inbound messages
+      <select id="status" aria-label="Filter by status">
+        <option value="REJECTED">Rejected</option><option value="ACCEPTED">Accepted</option><option value="">All</option>
+      </select>
+    </h2>
+    <div class="scroll"><table id="messages"></table></div>
+  </section>
+  <section>
+    <h2>Message detail</h2>
+    <div id="detail" class="muted">Select a message to see why it was rejected.</div>
+  </section>
+  <section>
+    <h2>Expected shipments</h2>
+    <div class="scroll"><table id="shipments"></table></div>
+  </section>
+</main>
+<script>
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const get = url => fetch(url).then(r => r.json());
+
+async function refresh() {
+  try {
+    const h = await get("/health");
+    document.getElementById("health").innerHTML =
+      `<span class="pill ${h.status}">${h.status}</span> v${esc(h.version)} · DB ${esc(h.database)} · pool ${h.pool.available}/${h.pool.size} free · backlog ${h.pendingBacklog}`;
+  } catch { document.getElementById("health").innerHTML = '<span class="pill DOWN">UNREACHABLE</span>'; return; }
+
+  const k = await get("/api/v1/reports/kpis");
+  const m = k.messagesLast24h || {};
+  const tiles = [
+    ["Accepted", m.ACCEPTED || 0], ["Rejected", m.REJECTED || 0], ["Pending", k.pendingBacklog],
+    ["Expected today", k.arrivals.expected_today], ["Arrived today", k.arrivals.arrived_today],
+    ["Avg processing (s)", k.avgProcessingSeconds ?? "–"],
+  ];
+  document.getElementById("tiles").innerHTML = tiles.map(([l, v]) => `<div class="tile"><b>${esc(v)}</b><span>${l}</span></div>`).join("");
+
+  const status = document.getElementById("status").value;
+  const msgs = await get(`/api/v1/messages?limit=100${status ? "&status=" + status : ""}`);
+  document.getElementById("messages").innerHTML =
+    "<tr><th>ID</th><th>Received</th><th>Partner</th><th>Channel</th><th>Ref</th><th>Shipment</th><th>Vehicles</th><th>Status</th><th>Errors</th></tr>" +
+    (msgs.length ? msgs.map(r => `<tr class="click" data-id="${r.message_id}"><td>${r.message_id}</td><td>${esc(r.received_at)}</td>
+      <td>${esc(r.partner_code)}</td><td>${r.channel}</td><td>${esc(r.message_ref)}</td><td>${esc(r.shipment_ref)}</td>
+      <td>${r.vehicle_count}</td><td><span class="pill ${r.status}">${r.status}</span></td><td>${esc(r.error_codes)}</td></tr>`).join("")
+      : '<tr><td colspan="9" class="muted">No messages.</td></tr>');
+
+  const ships = await get("/api/v1/shipments");
+  document.getElementById("shipments").innerHTML =
+    "<tr><th>Partner</th><th>Shipment</th><th>Expected arrival</th><th>Arrived</th></tr>" +
+    (ships.length ? ships.map(s => `<tr><td>${esc(s.partner_id)}</td><td>${esc(s.shipment_ref)}</td><td>${esc(s.expected_arrival)}</td>
+      <td>${s.arrived || 0} / ${s.vehicles}</td></tr>`).join("") : '<tr><td colspan="4" class="muted">No shipments.</td></tr>');
+}
+
+document.getElementById("messages").addEventListener("click", async e => {
+  const row = e.target.closest("tr[data-id]");
+  if (!row) return;
+  const m = await get(`/api/v1/messages/${row.dataset.id}`);
+  document.getElementById("detail").innerHTML =
+    `<p><span class="pill ${m.status}">${m.status}</span> message ${m.message_id} · ${esc(m.partner_code)} · ${m.channel}</p>` +
+    (m.errors.length ? "<table><tr><th>Code</th><th>Field</th><th>Detail</th></tr>" +
+      m.errors.map(x => `<tr><td>${esc(x.error_code)}</td><td>${esc(x.field_path)}</td><td style="white-space:normal">${esc(x.detail)}</td></tr>`).join("") + "</table>"
+      : "<p>No errors.</p>") +
+    `<p class="muted">Raw payload</p><pre>${esc(m.raw_payload)}</pre>`;
+});
+document.getElementById("status").addEventListener("change", refresh);
+refresh();
+setInterval(refresh, 10000);
+</script>
+</body>
+</html>
