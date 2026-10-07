@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PortFlow Case Study</title>
+<meta name="description" content="Terminal application and integration case study: from business requirement to operations, for a fictional vehicle terminal in Zeebrugge.">
+<style>
+  :root {
+    --bg: #f4f6f8; --panel: #ffffff; --text: #16202b; --muted: #5a6675; --line: #dbe1e8;
+    --accent: #1f5fae; --ok: #1e7f4f; --warn: #a15c00; --bad: #b42318; --track: #e6ebf1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f141a; --panel: #171e26; --text: #e5eaf0; --muted: #96a2b0; --line: #283340;
+            --accent: #6ea8ff; --ok: #4cc38a; --warn: #f0a83a; --bad: #f2786c; --track: #243040; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  header { background: var(--panel); border-bottom: 1px solid var(--line); }
+  header .wrap { padding-top: 28px; padding-bottom: 24px; }
+  .kicker { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0; }
+  h1 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 6px 0 10px; }
+  .lead { max-width: 760px; color: var(--muted); margin: 0; }
+  .note { font-size: 13px; color: var(--muted); margin-top: 12px; }
+  main .wrap { padding-top: 20px; padding-bottom: 40px; }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+  .card h2 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+  .row { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+  .ok { background: var(--ok); } .warn { background: var(--warn); } .bad { background: var(--bad); }
+  .bar { height: 8px; background: var(--track); border-radius: 99px; overflow: hidden; margin: 8px 0 6px; }
+  .bar span { display: block; height: 100%; width: 80%; background: var(--accent); }
+  .muted { color: var(--muted); font-size: 13px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 99px; border: 1px solid currentColor; }
+  section { margin-top: 26px; }
+  section > h2 { font-size: 18px; margin: 0 0 12px; }
+  .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .node { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font-size: 14px; }
+  .node b { display: block; font-size: 13px; }
+  .node small { color: var(--muted); }
+  .node.core { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+  .arrow { color: var(--muted); }
+  .steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .steps li { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .steps .n { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12px; }
+  .steps a { font-weight: 600; display: block; margin: 2px 0 4px; }
+  .steps p { margin: 0; font-size: 13px; color: var(--muted); }
+  pre { margin: 0; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; overflow-x: auto; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+  .scroll { overflow-x: auto; }
+  footer { color: var(--muted); font-size: 13px; padding: 24px 0 40px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <p class="kicker">PortFlow · Terminal IT operations case study</p>
+    <h1>From a business problem to a supported change, in one terminal integration</h1>
+    <p class="lead">A vehicle terminal in Zeebrugge receives vehicle announcements from logistics partners over REST and EDI.
+      Bad data used to surface at the gate. This case follows the work of an IT Development Officer:
+      requirements, specification, integration, Oracle, testing, release, and the incidents and changes once it runs.</p>
+    <p class="note">Fictional case built as a portfolio. Terminal, partners, figures and incidents are invented.</p>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="grid" aria-label="Case status on 2026-10-07">
+      <div class="card">
+        <h2>System health</h2>
+        <div class="row"><span><span class="dot ok"></span>REST channel</span><span class="muted">Osprey live</span></div>
+        <div class="row"><span><span class="dot ok"></span>EDI channel</span><span class="muted">Heron live</span></div>
+        <div class="row"><span><span class="dot ok"></span>Oracle</span><span class="muted">pool 10, alerts on</span></div>
+        <div class="row"><span><span class="dot warn"></span>Gannet</span><span class="muted">onboarding</span></div>
+      </div>
+      <div class="card">
+        <h2>Project</h2>
+        <div>Partner manifest integration</div>
+        <div class="bar" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"><span></span></div>
+        <div class="muted">~80 % · phase 4 of 5 · on track · <a href="../project-management/project-brief.md">brief</a></div>
+      </div>
+      <div class="card">
+        <h2>Open change</h2>
+        <div><a href="../changes/CR-001-new-logistics-partner.md">CR-001</a> Onboard Gannet Auto Carriers</div>
+        <div class="muted">Approved by CAB · in UAT · go-live 2026-11-03</div>
+      </div>
+      <div class="card">
+        <h2>Incidents</h2>
+        <div class="row"><a href="../incidents/INC-001-edi-processing-failure.md">INC-001</a><span class="muted">pool exhausted · problem closed</span></div>
+        <div class="row"><a href="../incidents/INC-002-partner-date-format-change.md">INC-002</a><span class="muted">partner format · PRB-002 open</span></div>
+      </div>
+    </div>
+
+    <section>
+      <h2>Architecture</h2>
+      <div class="flow" aria-label="Message flow from partner to users">
+        <div class="node"><b>Partners</b><small>REST · EDI</small></div><span class="arrow">→</span>
+        <div class="node"><b>Gateway / integration layer</b><small>auth · AS2/SFTP · routing</small></div><span class="arrow">→</span>
+        <div class="node core"><b>PortFlow</b><small>parse · validate · store</small></div><span class="arrow">→</span>
+        <div class="node"><b>Oracle</b><small>messages · shipments · views</small></div><span class="arrow">→</span>
+        <div class="node"><b>Operations · BI · TOS</b><small>rejections · KPIs · pre-advice</small></div>
+      </div>
+      <p class="muted">Around it: monitoring, logging, incident, problem, change and release management.
+        <a href="../docs/05-architecture.md">Architecture</a> · <a href="../architecture/integration-flow.md">integration flow</a>.</p>
+    </section>
+
+    <section>
+      <h2>The case in eight stops</h2>
+      <ol class="steps">
+        <li><span class="n">01</span><a href="../docs/02-business-requirements.md">Business requirement</a><p>Problem, rules, stories, FR/NFR with IDs.</p></li>
+        <li><span class="n">02</span><a href="../docs/05-architecture.md">Architecture</a><p>Why each component exists; demo vs JBoss/Oracle/iWay.</p></li>
+        <li><span class="n">03</span><a href="../docs/06-integration-design.md">API and EDI flow</a><p>One canonical model, idempotent, no lost messages.</p></li>
+        <li><span class="n">04</span><a href="../database/diagnostic-queries.sql">Oracle queries</a><p>Support investigations with data; run in CI on Oracle.</p></li>
+        <li><span class="n">05</span><a href="../incidents/INC-001-edi-processing-failure.md">Incident investigation</a><p>Outside-in analysis, real logs, five whys.</p></li>
+        <li><span class="n">06</span><a href="../changes/CR-001-new-logistics-partner.md">Change request</a><p>Scope, impact, security, risk, approval.</p></li>
+        <li><span class="n">07</span><a href="../testing/acceptance-tests.md">Test plan</a><p>Given / When / Then, each linked to an automated test.</p></li>
+        <li><span class="n">08</span><a href="../docs/08-release-plan.md">Release and rollback</a><p>Checklist, smoke test, rollback criteria.</p></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Responsibilities and evidence</h2>
+      <div class="card scroll">
+        <table>
+          <tr><th>Responsibility</th><th>Evidence</th></tr>
+          <tr><td>Analyse business needs</td><td><a href="../docs/01-business-context.md">Context</a>, <a href="../docs/02-business-requirements.md">requirements</a></td></tr>
+          <tr><td>Technical specifications</td><td><a href="../docs/04-technical-specification.md">Lastenboek</a>, <a href="../integrations/mapping-specification.md">EDI mapping</a>, <a href="../integrations/openapi.yaml">OpenAPI</a></td></tr>
+          <tr><td>Project plans and follow-up</td><td><a href="../project-management/project-brief.md">Brief</a>, <a href="../project-management/RAID-log.md">RAID</a>, <a href="../project-management/decision-log.md">decisions</a></td></tr>
+          <tr><td>Change requests</td><td><a href="../changes/CR-001-new-logistics-partner.md">CR-001</a>, <a href="../changes/CR-002-connection-leak-fix.md">CR-002</a>, <a href="../changes/impact-analysis.md">impact analysis</a></td></tr>
+          <tr><td>Application management, second line</td><td><a href="../docs/09-operational-runbook.md">Runbook</a>, <a href="../incidents/problem-analysis.md">problem analysis</a></td></tr>
+          <tr><td>Application linked to a database</td><td><a href="../service/README.md">Service</a>, <a href="../database/schema.sql">Oracle schema</a></td></tr>
+          <tr><td>Test procedures</td><td><a href="../docs/07-testing-strategy.md">Strategy</a>, <a href="../testing/regression-checklist.md">regression</a></td></tr>
+          <tr><td>External partners, stakeholders</td><td><a href="../docs/12-partner-onboarding.md">Onboarding</a>, <a href="../project-management/RACI.md">RACI</a>, <a href="../project-management/stakeholder-matrix.md">stakeholders</a></td></tr>
+        </table>
+      </div>
+      <p class="muted">Full mapping, including what this repository does not claim: <a href="../docs/role-mapping.md">role mapping</a>.</p>
+    </section>
+
+    <section>
+      <h2>Run it</h2>
+      <pre>cd service &amp;&amp; python3 -m portflow serve      # http://127.0.0.1:8080/ops
+scripts/smoke-test.sh                         # release smoke test
+scripts/simulate-incident.sh                  # replay INC-001 and its fix</pre>
+    </section>
+  </div>
+</main>
+<footer><div class="wrap">PortFlow case study · <a href="../README.md">README</a> · <a href="../docs/walkthrough.md">five-minute walkthrough</a></div></footer>
+</body>
+</html>

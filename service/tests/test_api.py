@@ -48,7 +48,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(body)["database"], "UP")
 
-    def test_manifest_lifecycle(self):
+    def test_at11_gate_arrival_updates_the_shipment(self):
         status, body = self.call("POST", "/api/v1/vehicle-manifests", manifest_json(messageRef="API-1", shipmentId="API-S1"))
         self.assertEqual(status, 201, body)
 
@@ -80,7 +80,7 @@ class ApiTest(unittest.TestCase):
         status, _ = self.call("POST", "/api/v1/gate-events", json.dumps({"vin": "WVWZZZE1ZPP099999"}))
         self.assertEqual(status, 404)
 
-    def test_kpis_and_ops_page(self):
+    def test_at13_kpis_are_available(self):
         status, body = self.call("GET", "/api/v1/reports/kpis")
         self.assertEqual(status, 200)
         self.assertIn("partners", json.loads(body))

@@ -85,7 +85,7 @@ class ManifestServiceTest(unittest.TestCase):
         retry = sample("sample-edi-gnt-utc.edi").replace("770001", "770002")
         self.assertEqual(self.service.submit(retry, "EDI").status, "ACCEPTED")
 
-    def test_partner_must_use_its_registered_channel(self):
+    def test_at14_partner_must_use_its_registered_channel(self):
         outcome = self.service.submit(manifest_json(partnerId="HRN"), "REST")
         self.assertEqual(self.error_codes(outcome), ["V-PARTNER-CHANNEL"])
 

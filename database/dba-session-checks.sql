@@ -25,7 +25,14 @@ SELECT s.sid, s.serial#, s.machine, s.status, s.last_call_et AS idle_seconds, t.
    AND s.status = 'INACTIVE'
    AND s.last_call_et > 300;
 
-PROMPT D3 Session and process limits of the instance
+PROMPT D3 Configured session and process limits
+COLUMN name FORMAT A12
+COLUMN value FORMAT A10
+SELECT name, value
+  FROM v$parameter
+ WHERE name IN ('sessions', 'processes');
+
+PROMPT D4 Current and peak usage against those limits (shows rows in the CDB root or a non-CDB)
 SELECT resource_name, current_utilization, max_utilization, limit_value
   FROM v$resource_limit
  WHERE resource_name IN ('sessions', 'processes');

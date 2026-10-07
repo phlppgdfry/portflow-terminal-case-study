@@ -5,6 +5,8 @@
 SET PAGESIZE 100
 SET LINESIZE 200
 SET VERIFY OFF
+ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI';
+ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS';
 COLUMN partner_code FORMAT A8
 COLUMN partner_id FORMAT A8
 COLUMN error_code FORMAT A20
@@ -12,6 +14,8 @@ COLUMN shipment_ref FORMAT A16
 COLUMN message_ref FORMAT A14
 COLUMN vin FORMAT A17
 COLUMN name FORMAT A26
+COLUMN shipments FORMAT A60
+COLUMN processing_time FORMAT A28
 
 PROMPT Q1 Rejected messages per partner, last 24 hours (runbook R2)
 SELECT partner_code,
@@ -94,7 +98,7 @@ SELECT v.vin,
 HAVING COUNT(*) > 1;
 
 PROMPT Q9 Full history of one VIN (user asks: where is my car?)
-DEFINE vin = 'KNAB2512AST123456'
+DEFINE vin = 'WVWZZZE1ZPP012345'
 SELECT 'ANNOUNCED' AS step, m.received_at AS at_time, s.partner_id AS detail_1, s.shipment_ref AS detail_2
   FROM vehicle v
   JOIN shipment s ON s.shipment_id = v.shipment_id

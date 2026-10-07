@@ -22,11 +22,17 @@ class EdiParsingTest(unittest.TestCase):
         segments = tokenize("UNB+A+B'FTX+AAI+++Deck 3?: high?'s'UNZ+1'")
         self.assertEqual(segments[1].value(3), "Deck 3: high's")
 
-    def test_utc_arrival_is_converted_to_terminal_time(self):
+    def test_at15_utc_arrival_is_converted_to_terminal_time(self):
         # CR-001: Gannet sends UTC (format 303). 11:30 UTC is 13:30 in Zeebrugge in October.
         manifest, issues = from_edi(sample("sample-edi-gnt-utc.edi"))
         self.assertEqual(issues, [])
         self.assertEqual(manifest.expected_arrival, "2026-10-09T13:30")
+
+    def test_unreleased_plus_in_utc_offset_is_rejected(self):
+        # CR-001 T2: '+' is the element separator, so it must be sent as '?+'.
+        broken = sample("sample-edi-gnt-utc.edi").replace("?+00", "+00")
+        _, issues = from_edi(broken)
+        self.assertEqual([i.code for i in issues], ["V-ARRIVAL-DATE"])
 
     def test_winter_time_offset(self):
         self.assertEqual(parse_edi_arrival("202612011130+00", "303")[0], "2026-12-01T12:30")
