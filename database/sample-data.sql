@@ -57,18 +57,18 @@ VALUES (6, 'V-PARTNER-INACTIVE', 'partnerId', 'partner status is ONBOARDING');
 
 -- Shipments created by the accepted messages.
 INSERT INTO shipment (shipment_id, partner_id, shipment_ref, terminal_code, expected_arrival, message_id)
-VALUES (1, 'HRN', 'HRN-2026-00119', 'BEZEE', CAST(TRUNC(SYSDATE) + 8 / 24 AS TIMESTAMP), 1);
+VALUES (1, 'HRN', 'HRN-2026-00119', 'BEZEE', SYSTIMESTAMP - INTERVAL '3' HOUR, 1);
 INSERT INTO shipment (shipment_id, partner_id, shipment_ref, terminal_code, expected_arrival, message_id)
-VALUES (2, 'OSP', 'OSP-2026-03310', 'BEZEE', CAST(TRUNC(SYSDATE) + 13 / 24 AS TIMESTAMP), 3);
+VALUES (2, 'OSP', 'OSP-2026-03310', 'BEZEE', SYSTIMESTAMP + INTERVAL '4' HOUR, 3);
 INSERT INTO shipment (shipment_id, partner_id, shipment_ref, terminal_code, expected_arrival, message_id)
-VALUES (3, 'OSP', 'OSP-2026-03317', 'BEZEE', CAST(TRUNC(SYSDATE) + 1 + 9.5 / 24 AS TIMESTAMP), 7);
+VALUES (3, 'OSP', 'OSP-2026-03317', 'BEZEE', SYSTIMESTAMP + INTERVAL '1' DAY, 7);
 
 INSERT INTO vehicle (vehicle_id, shipment_id, vin, make, model, status, arrived_at)
-VALUES (1, 1, 'WVWZZZE1ZPP012345', 'Volkswagen', 'ID.4', 'ARRIVED', CAST(TRUNC(SYSDATE) + 8.4 / 24 AS TIMESTAMP));
+VALUES (1, 1, 'WVWZZZE1ZPP012345', 'Volkswagen', 'ID.4', 'ARRIVED', SYSTIMESTAMP - INTERVAL '170' MINUTE(3));
 INSERT INTO vehicle (vehicle_id, shipment_id, vin, make, model, status, arrived_at)
-VALUES (2, 1, 'WVGZZZE2ZRP004211', 'Volkswagen', 'ID.5', 'ARRIVED', CAST(TRUNC(SYSDATE) + 8.5 / 24 AS TIMESTAMP));
+VALUES (2, 1, 'WVGZZZE2ZRP004211', 'Volkswagen', 'ID.5', 'ARRIVED', SYSTIMESTAMP - INTERVAL '165' MINUTE(3));
 INSERT INTO vehicle (vehicle_id, shipment_id, vin, make, model, status, arrived_at)
-VALUES (3, 1, 'TMBJR7NX3RY004422', 'Skoda', 'Enyaq', 'ARRIVED', CAST(TRUNC(SYSDATE) + 8.6 / 24 AS TIMESTAMP));
+VALUES (3, 1, 'TMBJR7NX3RY004422', 'Skoda', 'Enyaq', 'ARRIVED', SYSTIMESTAMP - INTERVAL '160' MINUTE(3));
 INSERT INTO vehicle (vehicle_id, shipment_id, vin, make, model, status)
 VALUES (4, 1, 'VF1RJB00X71234567', 'Renault', 'Megane E-Tech', 'EXPECTED');
 INSERT INTO vehicle (vehicle_id, shipment_id, vin, make, model, status)
@@ -77,7 +77,7 @@ INSERT INTO vehicle (vehicle_id, shipment_id, vin, make, model, status)
 VALUES (6, 2, 'KNAB2512AST123456', 'Kia', 'EV3', 'EXPECTED');
 INSERT INTO vehicle (vehicle_id, shipment_id, vin, make, model, status)
 VALUES (7, 2, 'YV1XZK9V1R2000748', 'Volvo', 'EX30', 'EXPECTED');
--- The same Kia announced again on tomorrow's shipment: a data-quality finding for query Q8.
+-- The same Kia announced again on the next shipment: a data-quality finding for query Q8.
 INSERT INTO vehicle (vehicle_id, shipment_id, vin, make, model, status)
 VALUES (8, 3, 'KNAB2512AST123456', 'Kia', 'EV3', 'EXPECTED');
 INSERT INTO vehicle (vehicle_id, shipment_id, vin, make, model, status)
@@ -86,10 +86,10 @@ INSERT INTO vehicle (vehicle_id, shipment_id, vin, make, model, status)
 VALUES (10, 3, 'SALGA2BJ0RA112233', 'Land Rover', 'Range Rover', 'EXPECTED');
 
 INSERT INTO terminal_event (vehicle_id, vin, event_type, event_time, source)
-VALUES (1, 'WVWZZZE1ZPP012345', 'ARRIVED', CAST(TRUNC(SYSDATE) + 8.4 / 24 AS TIMESTAMP), 'GATE');
+VALUES (1, 'WVWZZZE1ZPP012345', 'ARRIVED', SYSTIMESTAMP - INTERVAL '170' MINUTE(3), 'GATE');
 INSERT INTO terminal_event (vehicle_id, vin, event_type, event_time, source)
-VALUES (2, 'WVGZZZE2ZRP004211', 'ARRIVED', CAST(TRUNC(SYSDATE) + 8.5 / 24 AS TIMESTAMP), 'GATE');
+VALUES (2, 'WVGZZZE2ZRP004211', 'ARRIVED', SYSTIMESTAMP - INTERVAL '165' MINUTE(3), 'GATE');
 INSERT INTO terminal_event (vehicle_id, vin, event_type, event_time, source)
-VALUES (3, 'TMBJR7NX3RY004422', 'ARRIVED', CAST(TRUNC(SYSDATE) + 8.6 / 24 AS TIMESTAMP), 'GATE');
+VALUES (3, 'TMBJR7NX3RY004422', 'ARRIVED', SYSTIMESTAMP - INTERVAL '160' MINUTE(3), 'GATE');
 
 COMMIT;
