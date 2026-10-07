@@ -30,6 +30,8 @@
   .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
   .card h2 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
   .row { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; }
+  .row > a { white-space: nowrap; }
+  .row > .muted { text-align: right; }
   .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
   .ok { background: var(--ok); } .warn { background: var(--warn); } .bad { background: var(--bad); }
   .bar { height: 8px; background: var(--track); border-radius: 99px; overflow: hidden; margin: 8px 0 6px; }
@@ -144,7 +146,7 @@
 
     <section>
       <h2>Run it</h2>
-      <pre>cd service &amp;&amp; python3 -m portflow serve      # http://127.0.0.1:8080/ops
+      <pre>cd service &amp;&amp; python3 -m portflow serve       # http://127.0.0.1:8080/ops
 scripts/smoke-test.sh                         # release smoke test
 scripts/simulate-incident.sh                  # replay INC-001 and its fix</pre>
     </section>
