@@ -32,7 +32,7 @@ Business need ─► Requirements ─► Design ─► Integration ─► Databa
 | Architecture | [05 · Architecture](docs/05-architecture.md) · [context](architecture/system-context.md) · [flow](architecture/integration-flow.md) · [deployment](architecture/deployment-view.md) · [data](architecture/data-flow.md) |
 | Integration | [06 · Integration design](docs/06-integration-design.md) · [OpenAPI](integrations/openapi.yaml) · [EDI mapping](integrations/mapping-specification.md) · [error scenarios](integrations/error-scenarios.md) |
 | Database | [Data model](database/data-model.md) · [schema.sql](database/schema.sql) · [diagnostic queries](database/diagnostic-queries.sql) (Oracle, run in CI) |
-| Build | [`service/`](service/): working integration service with 38 automated tests |
+| Build | [`service/`](service/): working integration service plus terminal-event reference model; 52 automated tests |
 | Test | [07 · Testing strategy](docs/07-testing-strategy.md) · [test plan](testing/test-plan.md) · [acceptance tests](testing/acceptance-tests.md) · [regression](testing/regression-checklist.md) |
 | Release | [08 · Release plan](docs/08-release-plan.md) · [rollback plan](changes/rollback-plan.md) · [CHANGELOG](CHANGELOG.md) |
 | Operate | [09 · Runbook](docs/09-operational-runbook.md) · [10 · Infrastructure & app server](docs/10-infrastructure-and-application-server.md) · [11 · Reporting & KPIs](docs/11-reporting-and-kpis.md) |
@@ -44,15 +44,31 @@ Business need ─► Requirements ─► Design ─► Integration ─► Databa
 The [role mapping](docs/role-mapping.md) links each responsibility of an IT Development Officer
 to its evidence here.
 
-## Current state of the case (2026-10-07)
+## Fictional case timeline (snapshot: 2026-10-07)
 
 | | |
 |---|---|
-| Service | 🟢 1.2.1 in production · Osprey (REST) and Heron (EDI) live |
+| Service in the fictional scenario | 1.2.1 in production · Osprey (REST) and Heron (EDI) live; no actual production deployment is claimed |
 | Project | Phase 4 of 5 · ~80 % · on track |
 | Open change | [CR-001](changes/CR-001-new-logistics-partner.md) Gannet onboarding: approved, in UAT, go-live 2026-11-03 |
 | Last incident | [INC-002](incidents/INC-002-partner-date-format-change.md) resolved; [PRB-002](incidents/problem-analysis.md#prb-002-partner-changes-reach-us-as-incidents) open (partner change notice) |
 | Last problem closed | [PRB-001](incidents/problem-analysis.md#prb-001-recurring-database-connection-exhaustion) connection leak, fixed in 1.2.1 |
+
+## New: executable terminal-event contract
+
+Trace one synthetic vehicle from **gate → yard → customs hold → release → departure**.
+The reference model rejects a held departure, safely replays duplicate evidence and detects
+changed IDs and out-of-order events. This complements the announcement API with a separate,
+standalone event model.
+
+```bash
+python3 scripts/replay-terminal-events.py
+```
+
+[Contract and scenario](integrations/terminal-event-contract.md) ·
+[Fixture](integrations/sample-terminal-events.json) ·
+[Reproduced output](testing/terminal-event-evidence.json) ·
+[Acceptance tests](service/tests/test_terminal_events.py)
 
 ## Run it
 

@@ -1,0 +1,133 @@
+{
+  "synthetic": true,
+  "deliveries": [
+    {
+      "event": {
+        "schemaVersion": 1,
+        "source": "synthetic-tos",
+        "terminalId": "BEZEE",
+        "visitId": "DEMO-VISIT-001",
+        "vin": "YV1XZK9V1R2000731",
+        "eventId": "gate-001",
+        "type": "gate_in",
+        "occurredAt": "2026-10-22T08:00:00Z",
+        "observedAt": "2026-10-22T08:00:01Z"
+      },
+      "receivedAt": "2026-10-22T08:00:02Z",
+      "expected": "applied"
+    },
+    {
+      "event": {
+        "schemaVersion": 1,
+        "source": "synthetic-tos",
+        "terminalId": "BEZEE",
+        "visitId": "DEMO-VISIT-001",
+        "vin": "YV1XZK9V1R2000731",
+        "eventId": "yard-001",
+        "type": "yard_placed",
+        "occurredAt": "2026-10-22T08:10:00Z",
+        "observedAt": "2026-10-22T08:10:01Z",
+        "yardLocation": "YARD-A-12"
+      },
+      "receivedAt": "2026-10-22T08:10:02Z",
+      "expected": "applied"
+    },
+    {
+      "event": {
+        "schemaVersion": 1,
+        "source": "synthetic-tos",
+        "terminalId": "BEZEE",
+        "visitId": "DEMO-VISIT-001",
+        "vin": "YV1XZK9V1R2000731",
+        "eventId": "hold-001",
+        "type": "hold_opened",
+        "occurredAt": "2026-10-22T08:15:00Z",
+        "observedAt": "2026-10-22T08:15:01Z",
+        "holdId": "CUSTOMS-001"
+      },
+      "receivedAt": "2026-10-22T08:15:02Z",
+      "expected": "applied"
+    },
+    {
+      "event": {
+        "schemaVersion": 1,
+        "source": "synthetic-tos",
+        "terminalId": "BEZEE",
+        "visitId": "DEMO-VISIT-001",
+        "vin": "YV1XZK9V1R2000731",
+        "eventId": "blocked-out-001",
+        "type": "gate_out",
+        "occurredAt": "2026-10-22T08:20:00Z",
+        "observedAt": "2026-10-22T08:20:01Z"
+      },
+      "receivedAt": "2026-10-22T08:20:02Z",
+      "expected": "HOLD_BLOCKED"
+    },
+    {
+      "event": {
+        "schemaVersion": 1,
+        "source": "synthetic-tos",
+        "terminalId": "BEZEE",
+        "visitId": "DEMO-VISIT-001",
+        "vin": "YV1XZK9V1R2000731",
+        "eventId": "release-001",
+        "type": "hold_released",
+        "occurredAt": "2026-10-22T08:30:00Z",
+        "observedAt": "2026-10-22T08:30:01Z",
+        "holdId": "CUSTOMS-001"
+      },
+      "receivedAt": "2026-10-22T08:30:02Z",
+      "expected": "applied"
+    },
+    {
+      "event": {
+        "schemaVersion": 1,
+        "source": "synthetic-tos",
+        "terminalId": "BEZEE",
+        "visitId": "DEMO-VISIT-001",
+        "vin": "YV1XZK9V1R2000731",
+        "eventId": "out-001",
+        "type": "gate_out",
+        "occurredAt": "2026-10-22T08:45:00Z",
+        "observedAt": "2026-10-22T08:45:01Z"
+      },
+      "receivedAt": "2026-10-22T08:45:02Z",
+      "expected": "applied"
+    },
+    {
+      "event": {
+        "schemaVersion": 1,
+        "source": "synthetic-tos",
+        "terminalId": "BEZEE",
+        "visitId": "DEMO-VISIT-001",
+        "vin": "YV1XZK9V1R2000731",
+        "eventId": "out-001",
+        "type": "gate_out",
+        "occurredAt": "2026-10-22T08:45:00Z",
+        "observedAt": "2026-10-22T08:45:01Z"
+      },
+      "receivedAt": "2026-10-22T08:46:00Z",
+      "expected": "replayed"
+    },
+    {
+      "event": {
+        "schemaVersion": 1,
+        "source": "synthetic-tos",
+        "terminalId": "BEZEE",
+        "visitId": "DEMO-VISIT-001",
+        "vin": "YV1XZK9V1R2000731",
+        "eventId": "out-001",
+        "type": "gate_out",
+        "occurredAt": "2026-10-22T08:44:00Z",
+        "observedAt": "2026-10-22T08:45:01Z"
+      },
+      "receivedAt": "2026-10-22T08:46:00Z",
+      "expected": "ID_CONFLICT"
+    }
+  ],
+  "expectedFinal": {
+    "status": "DEPARTED",
+    "openHolds": [],
+    "yardLocation": "YARD-A-12"
+  }
+}

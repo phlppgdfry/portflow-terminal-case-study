@@ -1,6 +1,13 @@
 # Changelog
 
-All notable changes to PortFlow. Dates are those of the fictional case timeline.
+## Portfolio implementation · 22 October 2026
+
+- Added a standalone terminal-event contract and executable gate → yard → hold → release → departure fixture.
+- Added 14 acceptance tests covering ordering, source/visit boundaries, replay, conflicts and hold policy; the complete service suite has 52 tests.
+- Documented reconciliation ownership and the boundary between the in-memory event reference and the existing announcement API.
+- Linked reproducible output and added the scenario to CI.
+
+This section describes actual repository work. The versions and dates below belong to the fictional case timeline.
 
 ## 1.3.0 · planned 2026-11-03 · [CR-001](changes/CR-001-new-logistics-partner.md)
 

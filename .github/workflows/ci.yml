@@ -21,6 +21,8 @@ jobs:
         run: scripts/smoke-test.sh
       - name: Replay INC-001 and its fix
         run: scripts/simulate-incident.sh
+      - name: Reproduce terminal-event contract
+        run: python scripts/replay-terminal-events.py
       - name: Documentation links
         run: python scripts/check-links.py
 

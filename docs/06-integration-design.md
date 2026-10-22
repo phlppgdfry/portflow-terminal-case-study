@@ -136,3 +136,10 @@ message, or e-mail for small partners). That outbound step is outside this repos
 | Truncated file over SFTP | `UNT` count and `UNZ` control reference checks |
 | Database briefly unavailable | Retry, spool, automatic drain |
 | New partner with a slightly different dialect | Mapping review in onboarding ([12](12-partner-onboarding.md)) |
+
+## Actual terminal events after announcement
+
+The [gate-to-yard-to-departure contract](../integrations/terminal-event-contract.md) extends the
+case analysis with actual events, holds, replay/ordering rules and reconciliation ownership.
+A standalone executable reference and synthetic fixture verify the proposed rules. This is
+separate from the manifest API above; no additional REST endpoint is implied.

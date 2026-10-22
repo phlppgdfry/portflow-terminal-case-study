@@ -1,0 +1,23 @@
+{
+  "synthetic": true,
+  "deliveries": 8,
+  "outcomes": [
+    "applied",
+    "applied",
+    "applied",
+    "HOLD_BLOCKED",
+    "applied",
+    "applied",
+    "replayed",
+    "ID_CONFLICT"
+  ],
+  "finalState": {
+    "vin": "YV1XZK9V1R2000731",
+    "source": "synthetic-tos",
+    "status": "DEPARTED",
+    "yardLocation": "YARD-A-12",
+    "openHolds": [],
+    "lastOccurredAt": "2026-10-22T08:45:00Z",
+    "lastEventId": "out-001"
+  }
+}
